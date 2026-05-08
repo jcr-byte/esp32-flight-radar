@@ -30,11 +30,16 @@ void setup() {
   Serial.println("WiFi connected");
   Serial.println(WiFi.localIP());
 
-  String rawToken = fetchToken();
+  String rawToken = getAccessToken();
   
   Serial.printf("Free heap: %u\n", ESP.getFreeHeap());
   Serial.printf("Largest block: %u\n", ESP.getMaxAllocHeap());
   Serial.printf("Flash size: %u\n", ESP.getFlashChipSize());
+
+  double currentLat = 44.86499233980789;
+  double currentLon = -123.34256875649267;
+  std::vector<Flight> flights = getFlights(currentLat, currentLon);
+  Serial.printf("Got %u flights\n", flights.size());
 
 }
 
