@@ -30,7 +30,7 @@ String fetchToken() {
     if (err) {
         Serial.print("JSON parse failed: ");
         Serial.println(err.c_str());
-        return;
+        return "";
     }
 
     String token = doc["access_token"].as<String>();

@@ -31,7 +31,10 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   String rawToken = fetchToken();
-  Serial.println(rawToken);
+  
+  Serial.printf("Free heap: %u\n", ESP.getFreeHeap());
+  Serial.printf("Largest block: %u\n", ESP.getMaxAllocHeap());
+  Serial.printf("Flash size: %u\n", ESP.getFlashChipSize());
 
 }
 
