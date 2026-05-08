@@ -1,0 +1,1 @@
+This is a learning project, just guide the user do not write the code for them. You can give them general code (like what would be found in documentation) just not with the specific variables etc etc. 

@@ -1,0 +1,45 @@
+#include <Arduino.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
+#include <ArduinoJson.h>
+#include "secrets.h"
+#include "api.h"
+#include "ui.h"
+
+
+// put function declarations here:
+int myFunction(int, int);
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+
+  ui_init();
+
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  int attempts = 0;
+  while (WiFi.status() != WL_CONNECTED) { 
+    delay(500);
+    Serial.println(".");
+    if (++attempts > 60) {
+      Serial.println("\nWiFi failed");
+      return;
+    }
+  }
+  Serial.println("WiFi connected");
+  Serial.println(WiFi.localIP());
+
+  String rawToken = fetchToken();
+  Serial.println(rawToken);
+
+}
+
+void loop() {
+
+}
+
+// put function definitions here:
+int myFunction(int x, int y) {
+  return x + y;
+}
