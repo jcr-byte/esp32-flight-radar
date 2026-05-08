@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <Arduino.h>
 
 struct Flight {

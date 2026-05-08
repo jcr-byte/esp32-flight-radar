@@ -1,6 +1,14 @@
 #pragma once
+#include <api.h>
+
+struct FlightPosition {
+    int x;
+    int y;
+    bool inRange;
+};
 
 void ui_init();
-void ui_draw_flight();
+FlightPosition calculate_flight_positions(const Flight& f, double currentLat, double currentLong);
+void ui_draw_flights(const std::vector<Flight>& flights, double currentLat, double currentLong);
 void ui_clear();
 void ui_tick();
