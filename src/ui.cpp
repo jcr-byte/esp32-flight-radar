@@ -7,6 +7,9 @@
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite radar = TFT_eSprite(&tft);
 
+static int yOffset;
+const int RADAR_SIZE = 128;
+
 void ui_init() {
     tft.init();
     tft.setRotation(0);
@@ -16,7 +19,8 @@ void ui_init() {
     radar.createSprite(128, 128);
 
     ui_clear();
-    radar.pushSprite(0, 0);
+    yOffset = (tft.height() - RADAR_SIZE) / 2;
+    radar.pushSprite(0, yOffset);
 }
 
 FlightPosition calculate_flight_positions(const Flight& f, double currentLat, double currentLong) {
@@ -40,7 +44,7 @@ FlightPosition calculate_flight_positions(const Flight& f, double currentLat, do
     double x = cos(currentLatRad) * sin(flightLatRad) - sin(currentLatRad) * cos(flightLatRad) * cos(flightLonRad - currentLonRad); 
     double bearing = atan2(y, x);
 
-    double maxRange = 25000;
+    double maxRange = 30000;
     double normalized = distance / maxRange;
     currentFlight.inRange = (normalized <= 1.0);
 
@@ -61,10 +65,10 @@ void ui_draw_flights(const std::vector<Flight>& flights, double currentLat, doub
     for (int i = 0; i < flights.size(); ++i) {
         FlightPosition flightPos = calculate_flight_positions(flights.at(i), currentLat, currentLong);
         if (flightPos.inRange) {
-            radar.fillCircle(flightPos.x, flightPos.y, 1, TFT_RED);
+            radar.fillCircle(flightPos.x, flightPos.y, 2, TFT_RED);
         }
     }
-    radar.pushSprite(0, 0);
+    radar.pushSprite(0, yOffset);
 }
 
 void ui_clear() {
