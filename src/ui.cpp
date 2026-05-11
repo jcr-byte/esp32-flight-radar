@@ -44,7 +44,7 @@ FlightPosition calculate_flight_positions(const Flight& f, double currentLat, do
     double x = cos(currentLatRad) * sin(flightLatRad) - sin(currentLatRad) * cos(flightLatRad) * cos(flightLonRad - currentLonRad); 
     double bearing = atan2(y, x);
 
-    double maxRange = 30000;
+    double maxRange = 50000;
     double normalized = distance / maxRange;
     currentFlight.inRange = (normalized <= 1.0);
 
@@ -60,12 +60,44 @@ FlightPosition calculate_flight_positions(const Flight& f, double currentLat, do
     return currentFlight;
 }
 
+void drawPlaneTriangle(int cx, int cy, float heading, uint16_t color) {
+
+    int size = 5;
+
+    float headingRad = heading * (PI / 180.0f);
+    float cosHeading = cosf(headingRad);
+    float sinHeading = sinf(headingRad);
+
+    float tipX = 0;
+    float tipY = -size;
+    float backLeftx = -size * 0.6f;
+    float backLefty = size * 1.5f;
+    float backRightx = size * 0.6f;
+    float backRighty = size * 1.5f;
+
+    float tipXRotated = tipX * cosHeading - tipY * sinHeading;
+    float tipYRotated = tipX * sinHeading + tipY * cosHeading;
+    float backLeftXRotated = backLeftx * cosHeading - backLefty * sinHeading;
+    float backLeftYRotated = backLeftx * sinHeading + backLefty * cosHeading;
+    float backRightXRotated = backRightx * cosHeading - backRighty * sinHeading;
+    float backRightYRotated = backRightx * sinHeading + backRighty * cosHeading;
+
+    int tipFinalX = lroundf(tipXRotated + cx);
+    int tipFinalY = lroundf(tipYRotated + cy);
+    int backLeftFinalX = lroundf(backLeftXRotated + cx);
+    int backLeftFinalY = lroundf(backLeftYRotated + cy);
+    int backRightFinalX = lroundf(backRightXRotated + cx);
+    int backRightFinalY = lroundf(backRightYRotated + cy);
+
+    radar.fillTriangle(tipFinalX, tipFinalY, backLeftFinalX, backLeftFinalY, backRightFinalX, backRightFinalY, color);
+}
+
 void ui_draw_flights(const std::vector<Flight>& flights, double currentLat, double currentLong) {
     ui_clear();
     for (int i = 0; i < flights.size(); ++i) {
         FlightPosition flightPos = calculate_flight_positions(flights.at(i), currentLat, currentLong);
         if (flightPos.inRange) {
-            radar.fillCircle(flightPos.x, flightPos.y, 2, TFT_RED);
+            drawPlaneTriangle(flightPos.x, flightPos.y, flights.at(i).heading, TFT_RED);
         }
     }
     radar.pushSprite(0, yOffset);
@@ -81,6 +113,3 @@ void ui_clear() {
     radar.fillCircle(64, 64, 2, TFT_WHITE);   
 }
 
-void ui_tick() {
-
-}
