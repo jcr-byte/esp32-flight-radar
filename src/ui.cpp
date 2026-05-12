@@ -92,12 +92,16 @@ void drawPlaneTriangle(int cx, int cy, float heading, uint16_t color) {
     radar.fillTriangle(tipFinalX, tipFinalY, backLeftFinalX, backLeftFinalY, backRightFinalX, backRightFinalY, color);
 }
 
-void ui_draw_flights(const std::vector<Flight>& flights, double currentLat, double currentLong) {
+void ui_draw_flights(const std::vector<Flight>& flights, double currentLat, double currentLong, int selectedIndex) {
     ui_clear();
     for (int i = 0; i < flights.size(); ++i) {
         FlightPosition flightPos = calculate_flight_positions(flights.at(i), currentLat, currentLong);
         if (flightPos.inRange) {
-            drawPlaneTriangle(flightPos.x, flightPos.y, flights.at(i).heading, TFT_RED);
+            if (i == selectedIndex) {
+                drawPlaneTriangle(flightPos.x, flightPos.y, flights.at(i).heading, TFT_GREEN);
+            } else {
+                drawPlaneTriangle(flightPos.x, flightPos.y, flights.at(i).heading, TFT_RED);
+            }
         }
     }
     radar.pushSprite(0, yOffset);
