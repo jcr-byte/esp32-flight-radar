@@ -9,6 +9,7 @@ TFT_eSprite radar = TFT_eSprite(&tft);
 
 static int yOffset;
 const int RADAR_SIZE = 128;
+const double maxRange = 50000;
 
 void ui_init() {
     tft.init();
@@ -44,7 +45,6 @@ FlightPosition calculate_flight_positions(const Flight& f, double currentLat, do
     double x = cos(currentLatRad) * sin(flightLatRad) - sin(currentLatRad) * cos(flightLatRad) * cos(flightLonRad - currentLonRad); 
     double bearing = atan2(y, x);
 
-    double maxRange = 50000;
     double normalized = distance / maxRange;
     currentFlight.inRange = (normalized <= 1.0);
 
@@ -107,6 +107,12 @@ void ui_draw_flights(const std::vector<Flight>& flights, double currentLat, doub
     radar.pushSprite(0, yOffset);
 }
 
+int calculateRadiusDistances(int ringRadi) {
+    int distance = ringRadi * maxRange / 60;
+    return distance / 1000;
+}
+
+
 void ui_clear() {
     radar.fillSprite(TFT_BLACK);
     radar.drawCircle(64, 64, 60, TFT_DARKGREEN);       // outer ring
@@ -115,5 +121,19 @@ void ui_clear() {
     radar.drawLine(64, 0, 64, 127, TFT_DARKGREEN);     // crosshair
     radar.drawLine(0, 64, 127, 64, TFT_DARKGREEN);
     radar.fillCircle(64, 64, 2, TFT_WHITE);   
+    radar.setTextColor(TFT_DARKGREEN, TFT_BLACK);
+    radar.setTextSize(1);
+    radar.setTextDatum(MC_DATUM);
+    
+    int radiOne = calculateRadiusDistances(20);
+    String labelOne = String(radiOne) + "km";
+    radar.drawString(labelOne, 78, 48);
+    int radiTwo = calculateRadiusDistances(40);
+    String labelTwo = String(radiTwo) + "km";
+    radar.drawString(labelTwo, 78, 28);
+    int radiThree = calculateRadiusDistances(60);
+    String labelThree = String(radiThree) + "km";
+    radar.drawString(labelThree, 78, 8);
 }
+
 
