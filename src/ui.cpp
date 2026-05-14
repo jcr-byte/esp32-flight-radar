@@ -9,7 +9,7 @@ TFT_eSprite radar = TFT_eSprite(&tft);
 
 static int yOffset;
 const int RADAR_SIZE = 128;
-const double maxRange = 50000;
+const double maxRange = 100000;
 
 void ui_init() {
     tft.init();
@@ -19,7 +19,7 @@ void ui_init() {
     radar.setColorDepth(16);
     radar.createSprite(128, 128);
 
-    ui_clear();
+    ui_draw_radar();
     yOffset = (tft.height() - RADAR_SIZE) / 2;
     radar.pushSprite(0, yOffset);
 }
@@ -93,7 +93,8 @@ void drawPlaneTriangle(int cx, int cy, float heading, uint16_t color) {
 }
 
 void ui_draw_flights(const std::vector<Flight>& flights, double currentLat, double currentLong, int selectedIndex) {
-    ui_clear();
+    ui_clear_sprite();
+    ui_draw_radar();
     for (int i = 0; i < flights.size(); ++i) {
         FlightPosition flightPos = calculate_flight_positions(flights.at(i), currentLat, currentLong);
         if (flightPos.inRange) {
@@ -113,7 +114,16 @@ int calculateRadiusDistances(int ringRadi) {
 }
 
 
-void ui_clear() {
+void ui_clear_screen() {
+    tft.fillScreen(TFT_BLACK);
+}
+
+void ui_clear_sprite() {
+    radar.fillSprite(TFT_BLACK);
+}
+
+void ui_draw_radar() {
+    ui_clear_sprite();
     radar.fillSprite(TFT_BLACK);
     radar.drawCircle(64, 64, 60, TFT_DARKGREEN);       // outer ring
     radar.drawCircle(64, 64, 40, TFT_DARKGREEN);
@@ -137,3 +147,22 @@ void ui_clear() {
 }
 
 
+void ui_draw_details_page(Flight& f) {
+    ui_clear_sprite();
+    tft.fillScreen(TFT_BLACK);
+    radar.setTextColor(TFT_WHITE);
+    radar.setTextSize(1);
+    tft.setTextDatum(TL_DATUM);
+
+    String callSignString = "Callsign: " + f.callsign;
+    tft.drawString(callSignString, 3, 10);
+
+    String originCountryString = "Origin: " + f.originCountry;
+    tft.drawString(originCountryString, 3, 25);
+
+    String altitudeString = "Altitude: " + String(f.altitude) + "m";
+    tft.drawString(altitudeString, 3, 40);
+
+    String velocityString = "Velocity: " + String(f.velocity) + "m/s";
+    tft.drawString(velocityString, 3, 55);
+}

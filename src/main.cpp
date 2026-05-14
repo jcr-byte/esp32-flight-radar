@@ -33,6 +33,10 @@ int prevYAxisState = 0;
 int prevXAxisState = 0;
 int prevButtonState = 1; 
 
+// Screen states
+enum class Screen { Radar, Details };
+Screen currentScreen = Screen::Radar;
+
 // Flights array
 std::vector<Flight> flights;
 
@@ -101,7 +105,7 @@ void setup() {
 
 }
 
-void loop() {
+void handleRadarSreen() {
   int yAxisValue = analogRead(JOY_VRY_PIN);
   int yAxisState = 0;
   if (yAxisValue < JOY_Y_CENTER - JOY_DEAD_ZONE) {
@@ -141,6 +145,10 @@ void loop() {
     confirmedIndex = selectedIndex;
     Serial.print("CONFIRMED flight");
     Serial.println(confirmedIndex);
+
+    ui_clear_screen();
+    ui_draw_details_page(flights[selectedIndex]);
+    currentScreen = Screen::Details;
   }
 
   if (millis() - lastUpdate >= UPDATE_INTERVAL_MS) {
@@ -154,6 +162,28 @@ void loop() {
   prevXAxisState = xAxisState;
   prevButtonState = buttonState;
   delay(20);
+}
+
+void handleDetailsScreen() {
+  
+
+  int buttonState = digitalRead(JOY_SW_PIN);
+  if (buttonState == 0 && prevButtonState == 1) {
+
+    ui_clear_screen();
+    ui_draw_flights(flights, currentLat, currentLon, selectedIndex);
+    currentScreen = Screen::Radar;
+  }
+
+  prevButtonState = buttonState;
+  delay(20);
+}
+
+void loop() {
+  switch (currentScreen) {
+    case Screen::Radar: handleRadarSreen(); break;
+    case Screen::Details: handleDetailsScreen(); break;
+  }
 }
 
 // put function definitions here:

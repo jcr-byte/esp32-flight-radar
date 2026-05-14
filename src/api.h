@@ -6,6 +6,7 @@
 struct Flight {
     String icao24;
     String callsign;
+    String originCountry;
     float lat;
     float lon;
     float altitude;

@@ -101,6 +101,8 @@ vector<Flight> getFlights(const double currentLat, const double currentLong) {
         f.callsign = state[1].as<String>();
         f.callsign.trim();
 
+        f.originCountry = state[2].as<String>();
+
         if (state[5].isNull() || state[6].isNull()) {
             continue;
         }
