@@ -27,7 +27,7 @@ const int JOY_X_CENTER = 1935;
 const int JOY_DEAD_ZONE = 800;
 
 // Plane selection states
-int selectedIndex = 0;
+int selectedIndex = -1;
 int confirmedIndex = -1;
 int prevYAxisState = 0;
 int prevXAxisState = 0;
@@ -39,9 +39,36 @@ Screen currentScreen = Screen::Radar;
 
 // Flights array
 std::vector<Flight> flights;
+bool flightDataStale = true;
+
+void refreshFlights() {
+  FlightFetchResult result = getFlights(currentLat, currentLon);
+  if (!result.success) {
+    flightDataStale = true;
+    return;
+  }
+
+  String selectedId;
+  if (selectedIndex >= 0 && selectedIndex < int(flights.size())) {
+    selectedId = flights[selectedIndex].icao24;
+  }
+
+  flights.swap(result.flights);
+  flightDataStale = false;
+  selectedIndex = -1;
+  for (size_t i = 0; i < flights.size(); ++i) {
+    if (!calculate_flight_positions(flights[i], currentLat, currentLon).inRange) continue;
+    if (selectedIndex == -1) selectedIndex = int(i);
+    if (!selectedId.isEmpty() && flights[i].icao24 == selectedId) {
+      selectedIndex = int(i);
+      break;
+    }
+  }
+}
 
 // put function declarations here:
 int findNeighbor(int dirX, int dirY, int fromIndex, const std::vector<Flight>& flights) {
+  if (fromIndex < 0 || fromIndex >= int(flights.size())) return -1;
   FlightPosition currentFlightPos = calculate_flight_positions(flights[fromIndex], currentLat, currentLon);
   int bestIndex = -1;
   int bestScore = 100000;
@@ -97,11 +124,10 @@ void setup() {
   Serial.printf("Largest block: %u\n", ESP.getMaxAllocHeap());
   Serial.printf("Flash size: %u\n", ESP.getFlashChipSize());
 
-  flights = getFlights(currentLat, currentLon);
-  Serial.printf("Got %u flights\n", flights.size());
-
-  ui_draw_flights(flights, currentLat, currentLon, selectedIndex);
-
+  refreshFlights();
+  lastUpdate = millis();
+  Serial.printf("Got %u flights; stale=%d\n", flights.size(), flightDataStale);
+  ui_draw_flights(flights, currentLat, currentLon, selectedIndex, flightDataStale);
 
 }
 
@@ -119,7 +145,7 @@ void handleRadarSreen() {
     int next = findNeighbor(dirX, 0, selectedIndex, flights);
     if (next != -1) {
       selectedIndex = next;
-      ui_draw_flights(flights, currentLat, currentLon, selectedIndex);
+      ui_draw_flights(flights, currentLat, currentLon, selectedIndex, flightDataStale);
     }
   }
 
@@ -136,12 +162,12 @@ void handleRadarSreen() {
     int next = findNeighbor(0, dirY, selectedIndex, flights);
     if (next != -1) {
       selectedIndex = next;
-      ui_draw_flights(flights, currentLat, currentLon, selectedIndex);
+      ui_draw_flights(flights, currentLat, currentLon, selectedIndex, flightDataStale);
     }
   }
 
   int buttonState = digitalRead(JOY_SW_PIN);
-  if (buttonState == 0 && prevButtonState == 1) {
+  if (buttonState == 0 && prevButtonState == 1 && selectedIndex >= 0 && selectedIndex < int(flights.size())) {
     confirmedIndex = selectedIndex;
     Serial.print("CONFIRMED flight");
     Serial.println(confirmedIndex);
@@ -151,11 +177,11 @@ void handleRadarSreen() {
     currentScreen = Screen::Details;
   }
 
-  if (millis() - lastUpdate >= UPDATE_INTERVAL_MS) {
+  if (currentScreen == Screen::Radar && millis() - lastUpdate >= UPDATE_INTERVAL_MS) {
     lastUpdate = millis();
 
-    flights = getFlights(currentLat, currentLon);
-    ui_draw_flights(flights, currentLat, currentLon, selectedIndex);
+    refreshFlights();
+    ui_draw_flights(flights, currentLat, currentLon, selectedIndex, flightDataStale);
   }
 
   prevYAxisState = yAxisState;
@@ -171,7 +197,7 @@ void handleDetailsScreen() {
   if (buttonState == 0 && prevButtonState == 1) {
 
     ui_clear_screen();
-    ui_draw_flights(flights, currentLat, currentLon, selectedIndex);
+    ui_draw_flights(flights, currentLat, currentLon, selectedIndex, flightDataStale);
     currentScreen = Screen::Radar;
   }
 

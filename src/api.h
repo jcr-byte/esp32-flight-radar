@@ -15,6 +15,11 @@ struct Flight {
     bool onGround;
 };
 
+struct FlightFetchResult {
+    bool success;
+    std::vector<Flight> flights;
+};
+
 String fetchToken();
 String getAccessToken();
-std::vector<Flight> getFlights(const double currentLat, const double currentLong);
+FlightFetchResult getFlights(const double currentLat, const double currentLong);

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="960" viewBox="0 0 128 160" shape-rendering="crispEdges">
+  <title>Flight radar — 128 by 160 screen concept</title>
+  <desc>North-up radar with cyan aircraft, an amber selected aircraft, and a selected flight summary. All flight data is illustrative.</desc>
+  <rect width="128" height="160" fill="#07131f"/>
+  <g font-family="monospace" font-size="8" fill="#dceaf1">
+    <text x="5" y="11" font-weight="bold">AIRSPACE</text>
+    <circle cx="91" cy="8" r="2" fill="#63d5c4"/>
+    <text x="97" y="11" font-size="7" fill="#8da8b8">08 AC</text>
+  </g>
+  <path d="M4 16H124" stroke="#203747"/>
+  <g fill="none" stroke="#203747">
+    <circle cx="64" cy="76" r="50"/>
+    <circle cx="64" cy="76" r="33"/>
+    <circle cx="64" cy="76" r="17"/>
+    <path d="M14 76H114M64 26V126" stroke-dasharray="1 4"/>
+  </g>
+  <g stroke="#496372">
+    <path d="M64 26V30M64 122V126M14 76H18M110 76H114M29 41L32 44M96 108L99 111M29 111L32 108M96 44L99 41"/>
+  </g>
+  <g font-family="monospace" font-size="7" fill="#8da8b8" text-anchor="middle">
+    <text x="64" y="24" fill="#dceaf1">N</text>
+    <text x="7" y="79">W</text>
+    <text x="121" y="79">E</text>
+    <text x="64" y="135">S</text>
+  </g>
+  <g font-family="monospace" font-size="6" fill="#8da8b8">
+    <text x="85" y="123">100 km</text>
+  </g>
+  <g fill="#63d5e8">
+    <path d="M37 52l-3 8 4-2 4 1z"/>
+    <path d="M87 71l-3 8 4-2 4 1z" transform="rotate(75 87 75)"/>
+    <path d="M44 97l-3 8 4-2 4 1z" transform="rotate(210 44 101)"/>
+    <path d="M80 107l-3 8 4-2 4 1z" transform="rotate(300 80 111)"/>
+    <path d="M27 77l-3 8 4-2 4 1z" transform="rotate(145 27 81)"/>
+    <path d="M67 39l-3 8 4-2 4 1z" transform="rotate(30 67 43)"/>
+    <path d="M100 91l-3 8 4-2 4 1z" transform="rotate(100 100 95)"/>
+  </g>
+  <g stroke="#ffca70" fill="none">
+    <path d="M79 42H76V46M91 42H94V46M76 54V58H79M91 58H94V54"/>
+    <path d="M81 57L78 62" stroke="#7b6747"/>
+  </g>
+  <path d="M87 45l-6 6 4 0 3 3z" fill="#ffca70"/>
+  <circle cx="64" cy="76" r="3" fill="#07131f" stroke="#dceaf1"/>
+  <circle cx="64" cy="76" r="1" fill="#dceaf1"/>
+  <rect x="0" y="138" width="128" height="22" fill="#102432"/>
+  <path d="M0 138H128" stroke="#294353"/>
+  <rect x="0" y="139" width="2" height="21" fill="#ffca70"/>
+  <g font-family="monospace">
+    <text x="6" y="148" font-size="8" font-weight="bold" fill="#ffca70">ASA482</text>
+    <text x="122" y="148" text-anchor="end" font-size="6" fill="#8da8b8">PRESS: INFO</text>
+    <text x="6" y="157" font-size="7" fill="#dceaf1">10,670 m</text>
+    <text x="122" y="157" text-anchor="end" font-size="7" fill="#dceaf1">230 m/s</text>
+  </g>
+</svg>

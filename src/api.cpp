@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <vector>
+#include <utility>
+#include <math.h>
 #include "secrets.h"
 #include "api.h"
 
@@ -56,7 +58,7 @@ String getAccessToken() {
     return accessToken;
 }
 
-vector<Flight> getFlights(const double currentLat, const double currentLong) {
+FlightFetchResult getFlights(const double currentLat, const double currentLong) {
     double radius = 1.0; 
     double lamin = currentLat - radius;
     double lamax = currentLat + radius;
@@ -82,7 +84,7 @@ vector<Flight> getFlights(const double currentLat, const double currentLong) {
 
     if (code != HTTP_CODE_OK) {
         Serial.printf("Get flights request failed: code=%d body=%s\n", code, response.c_str());
-        return {};
+        return {false, {}};
     }
 
     JsonDocument doc;
@@ -90,7 +92,14 @@ vector<Flight> getFlights(const double currentLat, const double currentLong) {
     if (err) {
         Serial.print("JSON parse failed: ");
         Serial.println(err.c_str());
-        return {};
+        return {false, {}};
+    }
+
+    // A null states field is a successful empty response; a missing field is not.
+    if (!doc["time"].is<unsigned long>() || doc["states"].isUnbound() ||
+        !(doc["states"].isNull() || doc["states"].is<JsonArray>())) {
+        Serial.println("Invalid flight response");
+        return {false, {}};
     }
 
     vector<Flight> flights;
@@ -109,12 +118,12 @@ vector<Flight> getFlights(const double currentLat, const double currentLong) {
         f.lon = state[5].as<float>();
         f.lat = state[6].as<float>();
 
-        f.altitude = state[7].as<float>();
-        f.velocity = state[9].as<float>();
-        f.heading = state[10].as<float>();
+        f.altitude = (state[7].isNull() ? NAN : state[7].as<float>());
+        f.velocity = (state[9].isNull() ? NAN : state[9].as<float>());
+        f.heading = (state[10].isNull() ? NAN : state[10].as<float>());
         f.onGround = state[8].as<bool>();
         flights.push_back(f);
     }
 
-    return flights;
+    return {true, std::move(flights)};
 }
