@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "flight_geometry.h"
 #include <TFT_eSPI.h>
 #include <math.h>
 
@@ -6,10 +7,7 @@ namespace {
 TFT_eSPI tft;
 TFT_eSprite radar(&tft);
 bool spriteReady = false;
-constexpr int CENTER_X = 64;
-constexpr int CENTER_Y = 60; // sprite starts at screen y=16
-constexpr int RADIUS = 50;
-constexpr double MAX_RANGE = 100000.0;
+using namespace RadarGeometry;
 constexpr uint16_t BG = 0x08A3;
 constexpr uint16_t PANEL = 0x1126;
 constexpr uint16_t GRID = 0x21A8;
@@ -72,24 +70,6 @@ void ui_init() {
         return;
     }
     ui_draw_flights({}, 0, 0, -1, true);
-}
-
-FlightPosition calculate_flight_positions(const Flight& f, double lat, double lon) {
-    if (!isfinite(f.lat) || !isfinite(f.lon)) return {0, 0, false};
-    const double lat1 = lat * PI / 180, lat2 = f.lat * PI / 180;
-    const double deltaLat = lat2 - lat1, deltaLon = (f.lon - lon) * PI / 180;
-    double a = pow(sin(deltaLat / 2), 2) + cos(lat1) * cos(lat2) * pow(sin(deltaLon / 2), 2);
-    a = fmax(0.0, fmin(1.0, a));
-    const double distance = 6371000.0 * 2 * atan2(sqrt(a), sqrt(1 - a));
-    const double bearing = atan2(sin(deltaLon) * cos(lat2),
-        cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(deltaLon));
-    const double radius = distance / MAX_RANGE * RADIUS;
-    return {int(lround(CENTER_X + radius * sin(bearing))),
-            int(lround(CENTER_Y - radius * cos(bearing))), distance <= MAX_RANGE};
-}
-
-int calculateRadiusDistances(int radius) {
-    return lround(radius * MAX_RANGE / RADIUS / 1000);
 }
 
 void ui_clear_screen() { tft.fillScreen(BG); }
@@ -167,7 +147,7 @@ void ui_draw_flights(const std::vector<Flight>& flights, double lat, double lon,
     tft.setTextDatum(TL_DATUM);
 }
 
-void ui_draw_details_page(Flight& f) {
+void ui_draw_details_page(const Flight& f) {
     ui_clear_screen();
     label(callsign(f), 6, 7, AMBER);
     label("FLIGHT DETAILS", 6, 20, MUTED);
