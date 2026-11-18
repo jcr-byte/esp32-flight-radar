@@ -9,8 +9,8 @@ unsigned long lastUpdate = 0;
 const unsigned long UPDATE_INTERVAL_MS = 10000;
 
 // Location states
-double currentLat = 44.86499233980789;
-double currentLon = -123.34256875649267;
+double currentLat = 37.8199;   // Golden Gate Bridge, San Francisco
+double currentLon = -122.4783;
 
 // Joystick Pins
 const int JOY_VRX_PIN = 34;

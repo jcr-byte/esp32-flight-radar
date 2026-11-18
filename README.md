@@ -77,8 +77,8 @@ The ESP32 only supports 2.4 GHz Wi-Fi.
 Change the home coordinates in `src/main.cpp`:
 
 ```cpp
-double currentLat = 44.86499233980789;
-double currentLon = -123.34256875649267;
+double currentLat = 37.8199;   // Golden Gate Bridge, San Francisco
+double currentLon = -122.4783;
 ```
 
 ### 4. Build and flash
